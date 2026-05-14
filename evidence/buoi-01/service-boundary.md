@@ -20,14 +20,12 @@
 Nhóm em xây phần nào?
 
 Phần nhóm kiểm soát:
-
-- **Core Business API**: Hệ thống RESTful API trung tâm xử lý toàn bộ logic nghiệp vụ chính của sản phẩm (quản lý dữ liệu, xử lý quy trình, ra quyết định nghiệp vụ).
-- **Business Logic Layer**: Tầng xử lý nghiệp vụ bao gồm: xác thực dữ liệu đầu vào, áp dụng quy tắc nghiệp vụ (business rules), điều phối luồng xử lý giữa các module nội bộ.
-- **Database Management**: Thiết kế, quản lý và tương tác với cơ sở dữ liệu nghiệp vụ chính (PostgreSQL), bao gồm migration và seed data.
-- **Integration Layer**: Tầng tích hợp chịu trách nhiệm giao tiếp với các service khác trong hệ thống thông qua REST API hoặc Message Queue.
+- Core Business API: Hệ thống RESTful API trung tâm xử lý toàn bộ logic nghiệp vụ chính của sản phẩm (quản lý dữ liệu, xử lý quy trình, ra quyết định nghiệp vụ).
+- Business Logic Layer: Tầng xử lý nghiệp vụ bao gồm: xác thực dữ liệu đầu vào, áp dụng quy tắc nghiệp vụ (business rules), điều phối luồng xử lý giữa các module nội bộ.
+- Database Management: Thiết kế, quản lý và tương tác với cơ sở dữ liệu nghiệp vụ chính (PostgreSQL), bao gồm migration và seed data.
+- Integration Layer: Tầng tích hợp chịu trách nhiệm giao tiếp với các service khác trong hệ thống thông qua REST API hoặc Message Queue.
 
 Phần nhóm chỉ tích hợp:
-
 - Hệ thống AI Vision: Nhận kết quả phân tích hình ảnh (nhận diện đối tượng, biển số xe, ...) để xử lý nghiệp vụ tương ứng.
 - Hệ thống Notification: Gọi service thông báo để gửi cảnh báo, email, push notification đến người dùng.
 - Hệ thống Authentication: Xác thực và phân quyền người dùng được quản lý bởi service riêng hoặc tích hợp qua gateway chung.
@@ -36,7 +34,6 @@ Phần nhóm chỉ tích hợp:
 ## 4. Service Boundary
 
 Service của nhóm có trách nhiệm gì?
-
 - Tiếp nhận và xử lý các yêu cầu nghiệp vụ chính từ Frontend hoặc các service khác.
 - Thực thi logic nghiệp vụ trung tâm: xác thực dữ liệu, áp dụng business rules, tính toán và ra quyết định.
 - Quản lý vòng đời dữ liệu nghiệp vụ (CRUD) trên cơ sở dữ liệu chính.
@@ -45,7 +42,6 @@ Service của nhóm có trách nhiệm gì?
 - Ghi log hoạt động nghiệp vụ phục vụ audit và truy vết.
 
 Service KHÔNG làm gì?
-
 - KHÔNG thực hiện phân tích hình ảnh hay suy luận AI (thuộc trách nhiệm của AI Vision Service).
 - KHÔNG gửi trực tiếp thông báo đến người dùng (chỉ gọi đến Notification Service).
 - KHÔNG quản lý giao diện người dùng (UI/UX thuộc phần Frontend).
@@ -54,19 +50,17 @@ Service KHÔNG làm gì?
 ## 5. Input / Output
 
 ### Input
-
-- **HTTP Request từ Frontend**: Các request RESTful (JSON) chứa dữ liệu nghiệp vụ từ giao diện người dùng.
-- **API Call từ Service khác**: Kết quả phân tích từ AI Vision Service, yêu cầu truy vấn từ Analytics Service.
-- **Message Queue Event**: Sự kiện bất đồng bộ từ các service khác (ví dụ: camera phát hiện đối tượng mới).
+- HTTP Request từ Frontend: Các request RESTful (JSON) chứa dữ liệu nghiệp vụ từ giao diện người dùng.
+- API Call từ Service khác: Kết quả phân tích từ AI Vision Service, yêu cầu truy vấn từ Analytics Service.
+- Message Queue Event: Sự kiện bất đồng bộ từ các service khác (ví dụ: camera phát hiện đối tượng mới).
 
 ### Output
-
-- Định dạng JSON (API Response) bao gồm:
-  - `status`: Trạng thái xử lý (success / error).
-  - `data`: Dữ liệu nghiệp vụ được yêu cầu (danh sách, chi tiết, kết quả xử lý).
-  - `message`: Thông báo mô tả kết quả.
-  - `metadata`: Thông tin phân trang, timestamp, request_id phục vụ truy vết.
-- **Event/Message**: Phát sự kiện đến Message Queue để các service khác lắng nghe (ví dụ: đơn hàng mới, cảnh báo nghiệp vụ).
+Định dạng JSON (API Response) bao gồm:
+- status: Trạng thái xử lý (success / error).
+- data: Dữ liệu nghiệp vụ được yêu cầu (danh sách, chi tiết, kết quả xử lý).
+- message: Thông báo mô tả kết quả.
+- metadata: Thông tin phân trang, timestamp, request_id phục vụ truy vết.
+- Event/Message: Phát sự kiện đến Message Queue để các service khác lắng nghe (ví dụ: đơn hàng mới, cảnh báo nghiệp vụ).
 
 ## 6. API dự kiến
 
@@ -84,29 +78,66 @@ Service KHÔNG làm gì?
 ## 7. Phụ thuộc service khác
 
 Service này gọi đến service nào?
-
-- **AI Vision Service**: Gọi để lấy kết quả phân tích hình ảnh (nhận diện đối tượng, biển số xe) phục vụ xử lý nghiệp vụ.
-- **Notification Service**: Gọi để gửi thông báo (email, push notification) đến người dùng khi có sự kiện nghiệp vụ quan trọng.
-- **Database Service (PostgreSQL)**: Đọc/ghi dữ liệu nghiệp vụ chính.
-- **Message Queue (RabbitMQ)**: Publish sự kiện nghiệp vụ để các service khác subscribe và xử lý.
+- AI Vision Service: Gọi để lấy kết quả phân tích hình ảnh (nhận diện đối tượng, biển số xe) phục vụ xử lý nghiệp vụ.
+- Notification Service: Gọi để gửi thông báo (email, push notification) đến người dùng khi có sự kiện nghiệp vụ quan trọng.
+- Database Service (PostgreSQL): Đọc/ghi dữ liệu nghiệp vụ chính.
+- Message Queue (RabbitMQ): Publish sự kiện nghiệp vụ để các service khác subscribe và xử lý.
 
 Service nào gọi đến service này?
-
-- **Frontend / Client App**: Gọi API nghiệp vụ để hiển thị dữ liệu và thực hiện thao tác người dùng.
-- **AI Vision Service**: Gọi để đẩy kết quả phân tích cần xử lý nghiệp vụ tiếp theo (ví dụ: phát hiện vi phạm -> tạo biên bản).
-- **Analytics Service**: Gọi để truy vấn dữ liệu nghiệp vụ phục vụ báo cáo và thống kê.
+- Frontend / Client App: Gọi API nghiệp vụ để hiển thị dữ liệu và thực hiện thao tác người dùng.
+- AI Vision Service: Gọi để đẩy kết quả phân tích cần xử lý nghiệp vụ tiếp theo (ví dụ: phát hiện vi phạm -> tạo biên bản).
+- Analytics Service: Gọi để truy vấn dữ liệu nghiệp vụ phục vụ báo cáo và thống kê.
 
 ## 8. Sơ đồ minh họa
 
+Có thể vẽ bằng Mermaid, draw.io, Ludichart hoặc ảnh chụp sơ đồ.
+
 ```mermaid
 flowchart LR
-    User[Người dùng] --> Frontend[Frontend App]
-    Frontend --> Gateway[API Gateway]
-    Gateway --> Core[Core Business Service]
-    Core --> DB[(PostgreSQL)]
-    Core --> MQ[RabbitMQ]
-    Core --> AIVision[AI Vision Service]
-    Core --> Noti[Notification Service]
-    AIVision --> Core
-    Analytics[Analytics Service] --> Core
+    %% --- Colors & Styles ---
+    classDef actor fill:#f8cecc,stroke:#b85450,stroke-width:2px,color:#000
+    classDef frontend fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px,color:#000
+    classDef core fill:#d5e8d4,stroke:#82b366,stroke-width:2px,color:#000
+    classDef db fill:#fff2cc,stroke:#d6b656,stroke-width:2px,color:#000
+    classDef external fill:#e1d5e7,stroke:#9673a6,stroke-width:2px,color:#000
+    classDef queue fill:#ffe6cc,stroke:#d79b00,stroke-width:2px,color:#000
+
+    %% --- Components ---
+    Users(("🧑‍💻 Người dùng<br/>(SV, GV, Admin)")):::actor
+    
+    subgraph Client ["🖥️ Client Layer"]
+        App["📱 Frontend / Client App"]:::frontend
+    end
+
+    subgraph Boundary ["⚙️ System Boundary (Nhóm 12: Core Business)"]
+        direction TB
+        API["🌐 RESTful API Endpoint"]:::core
+        Logic["🧠 Business Logic Layer"]:::core
+        Integration["🔌 Integration Layer"]:::core
+        DB[("🗄️ PostgreSQL<br/>(Core Data)")]:::db
+        
+        API <--> Logic
+        Logic <--> Integration
+        Logic <-->|"Đọc / Ghi (CRUD)"| DB
+    end
+
+    subgraph External ["🔗 External Services"]
+        direction TB
+        AIVision["👁️ AI Vision Service"]:::external
+        Notification["✉️ Notification Service"]:::external
+        Analytics["📊 Analytics Service"]:::external
+        MQ["🐇 RabbitMQ<br/>(Message Queue)"]:::queue
+    end
+
+    %% --- Relationships ---
+    Users -->|"Thao tác UI"| App
+    App == "HTTP Request (JSON)" ==> API
+    
+    AIVision -. "Webhook: Đẩy KQ phân tích" .-> API
+    Integration -. "Gọi API xử lý ảnh" .-> AIVision
+    
+    Analytics -. "Truy vấn dữ liệu" .-> API
+    
+    Integration == "Gọi API (Gửi Email/Push)" ==> Notification
+    Integration == "Publish Event" ==> MQ
 ```
